@@ -25,6 +25,15 @@ function estimateHaikuCost(usage: { input_tokens: number; output_tokens: number 
   return (usage.input_tokens * 0.25 + usage.output_tokens * 1.25) / 1_000_000;
 }
 
+// Strip ```json ... ``` or ``` ... ``` fences the model sometimes emits despite
+// the prompt saying not to. Real fix in Phase 1 is to switch to Anthropic
+// tool-use mode (see evals/structured_output_policy.md).
+function extractJson(raw: string): string {
+  const trimmed = raw.trim();
+  const fence = trimmed.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/);
+  return fence ? fence[1].trim() : trimmed;
+}
+
 export async function normalizeJd(
   jdText: string,
   opts: { correlationId?: string; sourcePlatform?: string } = {},
@@ -48,7 +57,7 @@ export async function normalizeJd(
   let outputParsed: JdNormalizerOutputV1 | null = null;
   let schemaValid = false;
   try {
-    outputParsed = JdNormalizerSchemaV1.parse(JSON.parse(outputRaw));
+    outputParsed = JdNormalizerSchemaV1.parse(JSON.parse(extractJson(outputRaw)));
     schemaValid = true;
   } catch (e) {
     console.warn(`[normalizeJd ${traceId}] schema validation failed:`, e);
