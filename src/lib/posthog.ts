@@ -10,7 +10,11 @@ export function getPostHog(): PostHog {
     client = new PostHog(process.env.POSTHOG_API_KEY, {
       host: process.env.POSTHOG_HOST ?? "https://us.i.posthog.com",
       flushAt: 1,
+      flushInterval: 0,
     });
+    if (process.env.POSTHOG_DEBUG === "1") {
+      client.debug(true);
+    }
   }
   return client;
 }

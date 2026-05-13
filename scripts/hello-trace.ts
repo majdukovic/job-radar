@@ -1,4 +1,4 @@
-import "dotenv/config";
+// env vars loaded by `dotenv -e .env.local` (see package.json script)
 import { normalizeJd } from "../src/lib/llm";
 import { getPostHog } from "../src/lib/posthog";
 
@@ -31,8 +31,12 @@ async function main() {
   console.log("Parsed output:");
   console.log(JSON.stringify(outputParsed, null, 2));
 
-  await getPostHog().shutdown();
-  console.log("\nDone. Check PostHog → LLM Observability → Traces.");
+  console.log("\nFlushing PostHog events...");
+  const ph = getPostHog();
+  await ph.flush();
+  await ph.shutdown();
+  console.log("Done. Check PostHog → Activity → Explore (all events) first.");
+  console.log("If you see $ai_generation there, also check LLM Observability → Traces.");
 }
 
 main().catch((err) => {

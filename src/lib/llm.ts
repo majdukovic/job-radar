@@ -63,29 +63,35 @@ export async function normalizeJd(
     console.warn(`[normalizeJd ${traceId}] schema validation failed:`, e);
   }
 
+  const latencyMs = Date.now() - t0;
+  const costUsd = estimateHaikuCost(response.usage);
+
   const ph = getPostHog();
   ph.capture({
     distinctId: "single-seat",
     event: "$ai_generation",
     properties: {
-      trace_id: traceId,
-      correlation_id: correlationId,
+      // PostHog LLM Analytics standard fields ($ai_* prefix is required by the dashboard)
+      $ai_trace_id: correlationId,
+      $ai_span_id: traceId,
+      $ai_span_name: "jd_normalizer",
+      $ai_model: "claude-haiku-4-5-20251001",
+      $ai_provider: "anthropic",
+      $ai_input: [{ role: "user", content: prompt }],
+      $ai_input_tokens: response.usage.input_tokens,
+      $ai_output_choices: [{ role: "assistant", content: outputRaw }],
+      $ai_output_tokens: response.usage.output_tokens,
+      $ai_total_cost_usd: costUsd,
+      $ai_latency: latencyMs / 1000, // PostHog expects seconds
+      $ai_http_status: 200,
+      $ai_is_error: false,
+      $ai_model_parameters: { temperature: 0, max_tokens: 1024 },
+      // job-radar custom fields (for our own filters and CI)
       component: "jd_normalizer",
       prompt_template_name: "jd_normalizer_v1",
       prompt_version: "sha:bootstrap",
-      model: "claude-haiku-4-5-20251001",
-      model_provider: "anthropic",
-      temperature: 0,
-      max_tokens: 1024,
-      input_text: jdText,
-      output_raw: outputRaw,
       output_parsed: outputParsed,
       schema_valid: schemaValid,
-      latency_ms: Date.now() - t0,
-      input_tokens: response.usage.input_tokens,
-      output_tokens: response.usage.output_tokens,
-      cost_usd: estimateHaikuCost(response.usage),
-      timestamp_ms: Date.now(),
       sampling_bit: Math.random(),
       retry_count: 0,
       source_platform: sourcePlatform,
