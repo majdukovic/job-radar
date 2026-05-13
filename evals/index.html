@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>job-radar / evals — overview</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg-elev: #161b22;
+    --bg-card: #1c2128;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --accent: #58a6ff;
+    --accent-dim: #1f6feb;
+    --success: #3fb950;
+    --warn: #d29922;
+    --danger: #f85149;
+    --pink: #ff7b72;
+    --purple: #d2a8ff;
+    --teal: #56d4dd;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    padding-bottom: 60px;
+  }
+  header {
+    padding: 48px 32px 32px;
+    background: linear-gradient(180deg, #0d1117 0%, #161b22 100%);
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+  }
+  h1 {
+    font-size: 36px;
+    margin: 0 0 8px;
+    background: linear-gradient(90deg, var(--accent), var(--purple));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .subtitle { color: var(--text-dim); font-size: 16px; max-width: 640px; margin: 0 auto; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 32px; }
+  section { margin-bottom: 48px; }
+  h2 {
+    font-size: 24px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+    margin: 32px 0 16px;
+    color: var(--text);
+  }
+  h3 { font-size: 18px; color: var(--accent); margin-top: 24px; }
+  h4 { font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-dim); margin: 16px 0 8px; }
+  p, li { color: var(--text); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code, .mono { font-family: var(--mono); background: var(--bg-elev); padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+
+  /* Tiles */
+  .grid { display: grid; gap: 16px; }
+  .grid-2 { grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); }
+  .grid-3 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+  .grid-4 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    transition: transform 0.15s, border-color 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); border-color: var(--accent); }
+  .card h3 { margin-top: 0; }
+  .card p { font-size: 14px; color: var(--text-dim); margin: 4px 0 8px; }
+  .card .meta { font-size: 12px; color: var(--text-dim); font-family: var(--mono); }
+
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-right: 4px;
+    font-family: var(--mono);
+  }
+  .tag-foundation { background: #0d2818; color: var(--success); border: 1px solid var(--success); }
+  .tag-teaching   { background: #1d2840; color: var(--accent); border: 1px solid var(--accent); }
+  .tag-tool       { background: #2d1d40; color: var(--purple); border: 1px solid var(--purple); }
+  .tag-blocker    { background: #401818; color: var(--danger); border: 1px solid var(--danger); }
+  .tag-example    { background: #2d2818; color: var(--warn); border: 1px solid var(--warn); }
+
+  /* Phase pill */
+  .phase-pill {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    margin-right: 6px;
+  }
+
+  /* Workflow graph */
+  .workflow {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 32px 24px;
+    overflow-x: auto;
+  }
+  .workflow svg { display: block; margin: 0 auto; }
+
+  /* Daily ritual table */
+  table { width: 100%; border-collapse: collapse; }
+  th, td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    vertical-align: top;
+  }
+  th { color: var(--text-dim); font-weight: 600; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; }
+  td:first-child { font-family: var(--mono); color: var(--text-dim); white-space: nowrap; }
+  tr:hover td { background: var(--bg-elev); }
+
+  /* Methodology bullets */
+  .method-list { list-style: none; padding: 0; }
+  .method-list li {
+    padding: 12px 16px;
+    background: var(--bg-elev);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    border-left: 3px solid var(--accent);
+  }
+  .method-list li strong { color: var(--accent); }
+
+  /* Phase tabs */
+  .tabs { display: flex; gap: 4px; margin: 24px 0 16px; flex-wrap: wrap; }
+  .tab {
+    padding: 8px 14px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: var(--mono);
+    color: var(--text-dim);
+    transition: all 0.15s;
+  }
+  .tab.active { background: var(--accent-dim); color: white; border-color: var(--accent); }
+  .tab:hover:not(.active) { background: var(--bg-card); color: var(--text); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Calendar */
+  .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 16px; }
+  .calendar-day {
+    aspect-ratio: 1;
+    background: var(--bg-elev);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+  }
+  .calendar-day.work { background: #0d2818; color: var(--success); border-color: var(--success); font-weight: 600; }
+  .calendar-day.deep { background: #1d2840; color: var(--accent); border-color: var(--accent); font-weight: 600; }
+  .calendar-day.write { background: #2d1d40; color: var(--purple); border-color: var(--purple); font-weight: 600; }
+  .legend { display: flex; gap: 16px; margin-top: 12px; font-size: 12px; color: var(--text-dim); flex-wrap: wrap; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 2px; display: inline-block; margin-right: 6px; vertical-align: middle; }
+
+  /* Phase block */
+  .phase-block {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .phase-block h4 { margin-top: 0; color: var(--accent); font-size: 16px; text-transform: none; letter-spacing: 0; }
+  .phase-block .duration { float: right; font-family: var(--mono); font-size: 12px; color: var(--text-dim); }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    margin-top: 64px;
+    padding: 24px;
+    color: var(--text-dim);
+    font-size: 13px;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>job-radar / evals</h1>
+  <p class="subtitle">Visual entry point. What's in the planning folder, when to use each doc, and what your daily workflow looks like in each phase.</p>
+</header>
+
+<div class="container">
+
+<!-- ─── Methodology ──────────────────────────────────────────────── -->
+<section>
+  <h2>The methodology in 6 bullets</h2>
+  <ul class="method-list">
+    <li><strong>1. Use the tool first.</strong> Don't build evals before you have real data. Phase 1–2 = passive use + traces accumulate.</li>
+    <li><strong>2. Look at data weekly.</strong> 30–60 min/day ritual. Manually review 20–50 LLM outputs. Take open-coded notes, no categories yet.</li>
+    <li><strong>3. Cluster failures the next day.</strong> Re-read notes fresh. Same shape three times = a confirmed failure mode. Document as <code>FM-NNN.md</code>.</li>
+    <li><strong>4. Fix one mode carefully.</strong> Highest severity × frequency first. One change at a time. Don't ship without measuring.</li>
+    <li><strong>5. Measure on a frozen test set.</strong> If you iterated on it, it's dev. Test set is touched only at release decisions.</li>
+    <li><strong>6. Write up every change.</strong> Before/after numbers + statistical significance. That writeup becomes a portfolio artifact.</li>
+  </ul>
+</section>
+
+<!-- ─── Daily workflow graph ─────────────────────────────────────── -->
+<section>
+  <h2>Daily workflow — the loop</h2>
+  <div class="workflow">
+    <svg viewBox="0 0 900 460" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#8b949e"/>
+        </marker>
+        <linearGradient id="useGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#3fb950"/>
+          <stop offset="100%" stop-color="#2ea043"/>
+        </linearGradient>
+        <linearGradient id="lookGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#58a6ff"/>
+          <stop offset="100%" stop-color="#1f6feb"/>
+        </linearGradient>
+        <linearGradient id="fixGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#d2a8ff"/>
+          <stop offset="100%" stop-color="#a371f7"/>
+        </linearGradient>
+        <linearGradient id="measGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#d29922"/>
+          <stop offset="100%" stop-color="#9e6a03"/>
+        </linearGradient>
+        <linearGradient id="shipGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#ff7b72"/>
+          <stop offset="100%" stop-color="#da3633"/>
+        </linearGradient>
+      </defs>
+
+      <!-- Center title -->
+      <text x="450" y="240" text-anchor="middle" fill="#8b949e" font-size="13" font-family="ui-monospace">
+        the daily / weekly loop
+      </text>
+
+      <!-- 5 stages in a circle -->
+
+      <!-- 1. USE (top) -->
+      <g transform="translate(450, 60)">
+        <rect x="-90" y="-30" width="180" height="60" rx="8" fill="url(#useGrad)" />
+        <text x="0" y="-8" text-anchor="middle" fill="white" font-size="14" font-weight="600">1. USE the tool</text>
+        <text x="0" y="12" text-anchor="middle" fill="white" font-size="11" opacity="0.85">daily, every day</text>
+        <text x="0" y="-50" text-anchor="middle" fill="#8b949e" font-size="11">thumb up / down as you go</text>
+      </g>
+
+      <!-- 2. LOOK (right) -->
+      <g transform="translate(770, 200)">
+        <rect x="-90" y="-30" width="180" height="60" rx="8" fill="url(#lookGrad)" />
+        <text x="0" y="-8" text-anchor="middle" fill="white" font-size="14" font-weight="600">2. LOOK at data</text>
+        <text x="0" y="12" text-anchor="middle" fill="white" font-size="11" opacity="0.85">30–60 min/day or 90 min/wk</text>
+        <text x="0" y="45" text-anchor="middle" fill="#8b949e" font-size="11">manual error analysis</text>
+        <text x="0" y="60" text-anchor="middle" fill="#8b949e" font-size="11">→ failure taxonomy</text>
+      </g>
+
+      <!-- 3. FIX (lower right) -->
+      <g transform="translate(680, 380)">
+        <rect x="-90" y="-30" width="180" height="60" rx="8" fill="url(#fixGrad)" />
+        <text x="0" y="-8" text-anchor="middle" fill="white" font-size="14" font-weight="600">3. FIX one mode</text>
+        <text x="0" y="12" text-anchor="middle" fill="white" font-size="11" opacity="0.85">weekly, after clustering</text>
+        <text x="0" y="45" text-anchor="middle" fill="#8b949e" font-size="11">edit prompt → bump SHA</text>
+      </g>
+
+      <!-- 4. MEASURE (lower left) -->
+      <g transform="translate(220, 380)">
+        <rect x="-90" y="-30" width="180" height="60" rx="8" fill="url(#measGrad)" />
+        <text x="0" y="-8" text-anchor="middle" fill="white" font-size="14" font-weight="600">4. MEASURE</text>
+        <text x="0" y="12" text-anchor="middle" fill="white" font-size="11" opacity="0.85">after every fix</text>
+        <text x="0" y="45" text-anchor="middle" fill="#8b949e" font-size="11">promptfoo vs dev set</text>
+        <text x="0" y="60" text-anchor="middle" fill="#8b949e" font-size="11">+ Holm-Bonferroni</text>
+      </g>
+
+      <!-- 5. SHIP (left) -->
+      <g transform="translate(130, 200)">
+        <rect x="-90" y="-30" width="180" height="60" rx="8" fill="url(#shipGrad)" />
+        <text x="0" y="-8" text-anchor="middle" fill="white" font-size="14" font-weight="600">5. SHIP + WRITE</text>
+        <text x="0" y="12" text-anchor="middle" fill="white" font-size="11" opacity="0.85">on each significant Δ</text>
+        <text x="0" y="45" text-anchor="middle" fill="#8b949e" font-size="11">experiment writeup</text>
+        <text x="0" y="60" text-anchor="middle" fill="#8b949e" font-size="11">→ portfolio</text>
+      </g>
+
+      <!-- Arrows -->
+      <path d="M 540 75 Q 700 100 770 175" stroke="#8b949e" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+      <path d="M 770 230 Q 770 350 770 355" stroke="#8b949e" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+      <path d="M 590 380 L 320 380" stroke="#8b949e" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+      <path d="M 130 350 Q 130 230 130 230" stroke="#8b949e" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+      <path d="M 130 175 Q 200 100 360 75" stroke="#8b949e" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+
+    </svg>
+  </div>
+</section>
+
+<!-- ─── Per-phase workflows ──────────────────────────────────────── -->
+<section>
+  <h2>What you actually do each day, by phase</h2>
+  <p style="color: var(--text-dim);">Same loop above, but the volume and emphasis shifts as the project matures. Click a phase to see its specific daily/weekly rhythm.</p>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="p1">Phase 1</div>
+    <div class="tab" data-tab="p2">Phase 2</div>
+    <div class="tab" data-tab="p3">Phase 3</div>
+    <div class="tab" data-tab="p4">Phase 4</div>
+    <div class="tab" data-tab="p5">Phase 5</div>
+    <div class="tab" data-tab="p6">Phase 6+</div>
+  </div>
+
+  <!-- Phase 1 -->
+  <div class="tab-content active" id="p1">
+    <div class="phase-block">
+      <span class="duration">~3 evenings (beginner)</span>
+      <h4>Phase 1 — Scaffold + first traces flowing</h4>
+      <p>You're building the plumbing. No evals work yet — collecting traces is the goal.</p>
+      <table>
+        <tr><th>When</th><th>What</th><th>Why</th></tr>
+        <tr><td>Evening 1</td><td>Quickstart steps 0–7 (accounts, dependencies, Supabase schema)</td><td>Everything has to exist before you can call an LLM</td></tr>
+        <tr><td>Evening 2</td><td>Quickstart steps 8–10 (hello-trace script). First trace lands in PostHog.</td><td>Confirms tracing works end-to-end</td></tr>
+        <tr><td>Evening 3</td><td>Wire one Inngest worker against Remotive's free API. Run overnight.</td><td>Real production-shape data starts accumulating</td></tr>
+        <tr><td>Daily morning (30 sec)</td><td>Glance at PostHog LLM-health dashboard</td><td>Build the habit</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Phase 2 -->
+  <div class="tab-content" id="p2">
+    <div class="phase-block">
+      <span class="duration">~1 evening + 90-min session</span>
+      <h4>Phase 2 — More sources + first error-analysis session</h4>
+      <p>You add HN, Wellfound, LinkedIn Jobs. Then at the end of the week you sit down for your first manual review of 30–50 traces.</p>
+      <table>
+        <tr><th>When</th><th>What</th><th>Why</th></tr>
+        <tr><td>Mon–Fri evenings</td><td>Wire 1 new poller per day</td><td>Diverse data improves later evals</td></tr>
+        <tr><td>Sat morning, 90 min</td><td>Block phone. Open <code>/evals/inbox</code>. Apply the 20-item checklist from <code>interpreting_first_50_traces.md</code>.</td><td>This is the highest-leverage session of the project</td></tr>
+        <tr><td>Sun morning, 60 min</td><td>Cluster yesterday's open-coded notes. Write 4–7 <code>FM-NNN.md</code> files.</td><td>Failure taxonomy v1</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Phase 3 -->
+  <div class="tab-content" id="p3">
+    <div class="phase-block">
+      <span class="duration">~1 weekend</span>
+      <h4>Phase 3 — Labeled dataset + first promptfoo + skill matching</h4>
+      <p>Now you have failure modes; you build the eval set and start measuring.</p>
+      <table>
+        <tr><th>When</th><th>What</th><th>Why</th></tr>
+        <tr><td>Sat AM</td><td>Implement thumbs UI + <code>eval_labels</code> table writes</td><td>Passive labeling from daily use begins</td></tr>
+        <tr><td>Sat PM</td><td>Label 70 dev + 30 test + 20 adversarial, stratified across sources</td><td>Real eval set v1 (per <code>dataset_methodology.md</code>)</td></tr>
+        <tr><td>Sun AM</td><td>Write <code>promptfooconfig.yaml</code> with first 5 deterministic checks</td><td>CI evals begin</td></tr>
+        <tr><td>Sun PM</td><td>First prompt iteration on the top failure mode. Run promptfoo. Ship if Δ significant.</td><td>First experiment writeup</td></tr>
+        <tr><td>30 min daily</td><td>Thumb new jobs; weekly review pushes labels into the right set</td><td>Dataset grows</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Phase 4 -->
+  <div class="tab-content" id="p4">
+    <div class="phase-block">
+      <span class="duration">~1 weekend</span>
+      <h4>Phase 4 — First calibrated judge + recruiter pipeline</h4>
+      <p>You start automating eval judgment with LLM-as-judge. Bias mitigations mandatory.</p>
+      <table>
+        <tr><th>When</th><th>What</th><th>Why</th></tr>
+        <tr><td>Sat AM</td><td>Copy <code>judges/example_region_judge.md</code>. Adapt for your component.</td><td>Cross-family judge (GPT-4o-mini judges Claude)</td></tr>
+        <tr><td>Sat PM</td><td>Run calibration script. Measure κ on 30-row sample. Target ≥ 0.80.</td><td>Don't trust an uncalibrated judge</td></tr>
+        <tr><td>Sun AM</td><td>Diagnose disagreements. Tighten judge prompt. Re-calibrate.</td><td>Most judges need 2 iterations</td></tr>
+        <tr><td>Sun PM</td><td>Wire judge to PostHog at 25% sample rate</td><td>Online eval signal starts flowing</td></tr>
+        <tr><td>30 min daily</td><td>Daily ritual + weekly judge agreement drift check</td><td>Catches when judge needs re-calibration</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Phase 5 -->
+  <div class="tab-content" id="p5">
+    <div class="phase-block">
+      <span class="duration">~1 evening + 1 weekend</span>
+      <h4>Phase 5 — Cover-letter drafter + open-ended generation evals</h4>
+      <p>Hardest component to evaluate. Rubric-based judge required.</p>
+      <table>
+        <tr><th>When</th><th>What</th><th>Why</th></tr>
+        <tr><td>Weekend AM</td><td>Hand-write 10 gold cover letters. These are your ceiling reference.</td><td>Open-ended generation needs a "what does 5/5 look like" anchor</td></tr>
+        <tr><td>Weekend PM</td><td>Write <code>evals/rubrics/cover_letter.md</code> with anchored 1–5 scales</td><td>Rubrics without anchors are meaningless</td></tr>
+        <tr><td>Following week</td><td>Build rubric-based judge; calibrate</td><td>Same protocol as region judge, harder calibration</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Phase 6 -->
+  <div class="tab-content" id="p6">
+    <div class="phase-block">
+      <span class="duration">Ongoing</span>
+      <h4>Phase 6 → Maintenance — Daily rhythm forever</h4>
+      <p>The tool is shipping. The work becomes a steady loop. This is the rhythm AI Evals Engineers run permanently.</p>
+      <table>
+        <tr><th>When</th><th>What</th><th>Why</th></tr>
+        <tr><td>Daily morning (30 sec)</td><td>Glance at LLM-health dashboard. Anything red?</td><td>Catches schema-validity drift, cost spikes</td></tr>
+        <tr><td>Daily (30 min)</td><td>Review 10 new thumbs-down or low-judge-score traces</td><td>Refreshes the failure taxonomy</td></tr>
+        <tr><td>Weekly (60 min)</td><td>Inbox review: promote labels to dev/test/adversarial</td><td>Dataset grows by ~30/week</td></tr>
+        <tr><td>Weekly (30 min)</td><td>Check judge agreement drift. Re-calibrate if &gt; 5% shift.</td><td>Catches LLM provider model drift</td></tr>
+        <tr><td>Monthly (90 min)</td><td>Re-measure baselines. Refresh adversarial set.</td><td>Catches data drift</td></tr>
+        <tr><td>Per ship</td><td>Write experiment markdown. Push to public repo.</td><td>Portfolio compounds</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Calendar visualization ───────────────────────────────────── -->
+<section>
+  <h2>A typical week, visually</h2>
+  <p style="color: var(--text-dim);">Phase 3+ steady-state.</p>
+  <div class="calendar">
+    <div class="calendar-day">Mon</div>
+    <div class="calendar-day">Tue</div>
+    <div class="calendar-day">Wed</div>
+    <div class="calendar-day">Thu</div>
+    <div class="calendar-day">Fri</div>
+    <div class="calendar-day">Sat</div>
+    <div class="calendar-day">Sun</div>
+
+    <div class="calendar-day work">USE<br>30m</div>
+    <div class="calendar-day work">USE<br>30m</div>
+    <div class="calendar-day work">USE<br>30m</div>
+    <div class="calendar-day work">USE<br>30m</div>
+    <div class="calendar-day work">USE<br>30m</div>
+    <div class="calendar-day deep">REVIEW<br>60m</div>
+    <div class="calendar-day deep">CLUSTER<br>60m</div>
+
+    <div class="calendar-day"></div>
+    <div class="calendar-day"></div>
+    <div class="calendar-day work">+ LABEL<br>15m</div>
+    <div class="calendar-day"></div>
+    <div class="calendar-day work">+ LABEL<br>15m</div>
+    <div class="calendar-day write">FIX +<br>SHIP</div>
+    <div class="calendar-day write">WRITE<br>UP</div>
+  </div>
+  <div class="legend">
+    <span><span class="legend-dot" style="background: #3fb950;"></span>Light use / labeling</span>
+    <span><span class="legend-dot" style="background: #58a6ff;"></span>Deep error analysis</span>
+    <span><span class="legend-dot" style="background: #d2a8ff;"></span>Ship + write</span>
+  </div>
+</section>
+
+<!-- ─── All docs ─────────────────────────────────────────────────── -->
+<section>
+  <h2>All the planning docs</h2>
+
+  <h3>Foundation — start here</h3>
+  <div class="grid grid-3">
+    <a class="card" href="../job-radar-plan.md">
+      <span class="tag tag-foundation">FOUNDATION</span>
+      <h3>job-radar-plan.md</h3>
+      <p>The complete project plan: architecture, schema, workers, phases, costs, hireability.</p>
+      <span class="meta">~/Desktop/job-radar-plan.md</span>
+    </a>
+    <a class="card" href="README.md">
+      <span class="tag tag-foundation">FOUNDATION</span>
+      <h3>README.md</h3>
+      <p>Reading order. How docs relate. The methodology in one minute.</p>
+      <span class="meta">README.md</span>
+    </a>
+    <a class="card" href="quickstart.md">
+      <span class="tag tag-foundation">FOUNDATION</span>
+      <h3>quickstart.md</h3>
+      <p>Day 1 setup. Accounts, dependencies, schema, first emitted trace. ~2–3 hours.</p>
+      <span class="meta">quickstart.md</span>
+    </a>
+    <a class="card" href="glossary.md">
+      <span class="tag tag-foundation">FOUNDATION</span>
+      <h3>glossary.md</h3>
+      <p>Every term used elsewhere, defined. Open in a tab while reading other docs.</p>
+      <span class="meta">glossary.md</span>
+    </a>
+  </div>
+
+  <h3>Blockers — the 6 specs that close the audit findings</h3>
+  <div class="grid grid-2">
+    <a class="card" href="trace_schema.md">
+      <span class="tag tag-blocker">BLOCKER 1</span>
+      <h3>trace_schema.md</h3>
+      <p>Full <code>$ai_generation</code> payload. Prompt-version SHA, correlation IDs, sampling bit, redaction.</p>
+      <span class="meta">Phase 1 prerequisite</span>
+    </a>
+    <a class="card" href="baselines.md">
+      <span class="tag tag-blocker">BLOCKER 2</span>
+      <h3>baselines.md</h3>
+      <p>Dumb baseline + smart baseline per component. LLM must beat smart_baseline by 5pts or doesn't ship.</p>
+      <span class="meta">Phase 1 prerequisite</span>
+    </a>
+    <a class="card" href="dataset_methodology.md">
+      <span class="tag tag-blocker">BLOCKER 3</span>
+      <h3>dataset_methodology.md</h3>
+      <p>70/30 dev/test with frozen test, stratified sampling, kappa, Wilson intervals, PII redaction.</p>
+      <span class="meta">Phase 3 prerequisite</span>
+    </a>
+    <a class="card" href="success_criteria.md">
+      <span class="tag tag-blocker">BLOCKER 4</span>
+      <h3>success_criteria.md</h3>
+      <p>Pre-registered metrics + CI gates + severity weights, Holm-Bonferroni correction.</p>
+      <span class="meta">Phase 1 prerequisite</span>
+    </a>
+    <a class="card" href="structured_output_policy.md">
+      <span class="tag tag-blocker">BLOCKER 5</span>
+      <h3>structured_output_policy.md</h3>
+      <p>Zod schemas, 2-retry policy, Sonnet fallback, manual review queue, tool-use mode preference.</p>
+      <span class="meta">Phase 1 prerequisite</span>
+    </a>
+    <a class="card" href="failure_taxonomy_template.md">
+      <span class="tag tag-blocker">BLOCKER 6</span>
+      <h3>failure_taxonomy_template.md</h3>
+      <p>FM-NNN schema with frontmatter, status workflow, worked example FM-001.</p>
+      <span class="meta">Phase 2 prerequisite</span>
+    </a>
+  </div>
+
+  <h3>Teaching — concepts you'll need</h3>
+  <div class="grid grid-2">
+    <a class="card" href="prompt_engineering_primer.md">
+      <span class="tag tag-teaching">TEACHING</span>
+      <h3>prompt_engineering_primer.md</h3>
+      <p>Six patterns (system+user, few-shot, tool-use, CoT, self-check, negative examples) with job-radar examples.</p>
+    </a>
+    <a class="card" href="qa_to_ai_evals_dictionary.md">
+      <span class="tag tag-teaching">TEACHING</span>
+      <h3>qa_to_ai_evals_dictionary.md</h3>
+      <p>Your QA vocabulary → AI-evals dialect. 60% of evals is QA you already know.</p>
+    </a>
+    <a class="card" href="interpreting_first_50_traces.md">
+      <span class="tag tag-teaching">TEACHING</span>
+      <h3>interpreting_first_50_traces.md</h3>
+      <p>What to look for during your first error-analysis session. 20-item checklist.</p>
+    </a>
+    <a class="card" href="lib_eval_stats_explained.md">
+      <span class="tag tag-teaching">TEACHING</span>
+      <h3>lib_eval_stats_explained.md</h3>
+      <p>Stats helpers (kappa, Wilson CI, Holm-Bonferroni) — concepts + full TypeScript code.</p>
+    </a>
+  </div>
+
+  <h3>Tools — get the tooling running</h3>
+  <div class="grid grid-2">
+    <a class="card" href="promptfoo_starter.md">
+      <span class="tag tag-tool">TOOL</span>
+      <h3>promptfoo_starter.md</h3>
+      <p>Install, minimal YAML config, run, CI integration, side-by-side prompt diff.</p>
+    </a>
+    <a class="card" href="posthog_llm_analytics_starter.md">
+      <span class="tag tag-tool">TOOL</span>
+      <h3>posthog_llm_analytics_starter.md</h3>
+      <p>Enabling LLM Observability, trace view, filters, adding hog + LLM-judge evaluators.</p>
+    </a>
+  </div>
+
+  <h3>Worked examples — the methodology in action</h3>
+  <div class="grid grid-2">
+    <a class="card" href="judges/example_region_judge.md">
+      <span class="tag tag-example">EXAMPLE</span>
+      <h3>judges/example_region_judge.md</h3>
+      <p>Complete annotated cross-family LLM-as-judge with full calibration protocol.</p>
+    </a>
+    <a class="card" href="walkthroughs/end_to_end_example.md">
+      <span class="tag tag-example">EXAMPLE</span>
+      <h3>walkthroughs/end_to_end_example.md</h3>
+      <p>One real-shaped JD through every stage: ingest → normalize → score → thumb → fix → ship.</p>
+    </a>
+    <a class="card" href="dry_run_case_study.md">
+      <span class="tag tag-example">EXAMPLE</span>
+      <h3>dry_run_case_study.md</h3>
+      <p><strong>★ Read this.</strong> 15-day narrative — Mate (you) in Croatia, hunting remote QA, applying Hamel/Shreya methodology day-by-day.</p>
+    </a>
+  </div>
+</section>
+
+<!-- ─── Reading order ───────────────────────────────────────────── -->
+<section>
+  <h2>Recommended reading order for someone new</h2>
+  <table>
+    <tr><th>#</th><th>Doc</th><th>Why now</th><th>Time</th></tr>
+    <tr><td>1</td><td>This page (you're here)</td><td>Visual overview</td><td>10 min</td></tr>
+    <tr><td>2</td><td><a href="../job-radar-plan.md">job-radar-plan.md</a></td><td>What the product is</td><td>15 min</td></tr>
+    <tr><td>3</td><td><a href="glossary.md">glossary.md</a></td><td>Skim, leave open in a tab</td><td>10 min</td></tr>
+    <tr><td>4</td><td><a href="dry_run_case_study.md">dry_run_case_study.md</a></td><td>The methodology in narrative form</td><td>20 min</td></tr>
+    <tr><td>5</td><td><a href="quickstart.md">quickstart.md</a></td><td>Set up your environment</td><td>2–3 hours hands-on</td></tr>
+    <tr><td>6</td><td><a href="prompt_engineering_primer.md">prompt_engineering_primer.md</a></td><td>Before you write your first prompt</td><td>15 min</td></tr>
+    <tr><td>7</td><td><a href="trace_schema.md">trace_schema.md</a></td><td>What every LLM call must log</td><td>10 min</td></tr>
+    <tr><td>8</td><td><a href="success_criteria.md">success_criteria.md</a></td><td>What "good" means before you write code</td><td>10 min</td></tr>
+    <tr><td>9</td><td><a href="walkthroughs/end_to_end_example.md">walkthroughs/end_to_end_example.md</a></td><td>One full pipeline pass, all JSON shown</td><td>15 min</td></tr>
+    <tr><td>10</td><td>Start Phase 1 build</td><td>—</td><td>—</td></tr>
+  </table>
+  <p style="color: var(--text-dim); margin-top: 16px;">After Phase 1 ships, read in this order as you need them: <code>interpreting_first_50_traces.md</code> → <code>failure_taxonomy_template.md</code> → <code>baselines.md</code> → <code>dataset_methodology.md</code> → <code>promptfoo_starter.md</code> → <code>lib_eval_stats_explained.md</code> → <code>judges/example_region_judge.md</code> → <code>posthog_llm_analytics_starter.md</code>.</p>
+</section>
+
+<!-- ─── The career angle ────────────────────────────────────────── -->
+<section>
+  <h2>What this becomes on your CV</h2>
+  <div class="grid grid-2">
+    <div class="card">
+      <h3 style="color: var(--success);">Public GitHub artifacts</h3>
+      <ul>
+        <li><code>evals/failure_modes/FM-NNN.md</code> — categorized failure taxonomy</li>
+        <li><code>evals/eval_set.jsonl</code> — labeled dataset (PII-redacted)</li>
+        <li><code>evals/judges/region_judge.md</code> — calibrated cross-family judge with κ numbers</li>
+        <li><code>evals/experiments/E-NNN.md</code> — before/after writeups per shipped change</li>
+        <li><code>evals/releases.md</code> — release history with scores</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="color: var(--accent);">Blog posts you'll write</h3>
+      <ul>
+        <li>"Error analysis on my first 50 LLM traces: 6 failure modes I didn't predict"</li>
+        <li>"Calibrating my first LLM-as-judge: κ 0.62 → 0.83 in three changes"</li>
+        <li>"How tool-use mode fixed a region-classifier bias that few-shot couldn't"</li>
+        <li>"Rubric-based judges for open-ended cover-letter generation"</li>
+        <li>"How I cut my eval cost 4× with smarter sampling"</li>
+      </ul>
+    </div>
+  </div>
+  <p style="color: var(--text-dim); margin-top: 16px; text-align: center; font-style: italic;">
+    Those artifacts + your QA background = recruiter contact from AI labs. Hireable for "Research Engineer, Frontier Evals" / "LLM Evaluation Engineer" / "AI QA Engineer" roles.
+  </p>
+</section>
+
+</div>
+
+<footer>
+  job-radar / evals overview · planning artifact created 2026-05-13<br>
+  All docs in <code>~/Desktop/job-radar-evals/</code> · master plan at <code>~/Desktop/job-radar-plan.md</code>
+</footer>
+
+<script>
+  // Tab switcher
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const target = tab.dataset.tab;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(target).classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
