@@ -299,7 +299,7 @@ These choices come from the [Hamel Husain + Shreya Shankar AI Evals methodology]
 
 ## About the author
 
-**Mate Ajdukovic** — mobile QA engineer (Appium, Cypress, Java, JUnit, TestNG) pivoting toward AI Evals Engineering. Based in Zagreb, Croatia. Building this as both a daily-use tool and a public portfolio of the discipline.
+**Mate Ajdukovic** — [test automation / mobile QA engineer](https://www.linkedin.com/in/mateajdukovic/) pivoting toward AI Evals Engineering. Based in Sinj, Croatia. Building this as both a daily-use tool and a public portfolio of the discipline.
 
 The [`evals/qa_to_ai_evals_dictionary.md`](./evals/qa_to_ai_evals_dictionary.md) doc maps my existing QA vocabulary onto the AI-evals dialect — it's the bridge between what I've been doing for years and the role I'm now targeting.
 
