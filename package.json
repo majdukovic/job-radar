@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "hello-trace": "dotenv -e .env.local -- tsx scripts/hello-trace.ts"
+    "hello-trace": "dotenv -e .env.local -- tsx scripts/hello-trace.ts",
+    "check-db": "dotenv -e .env.local -- tsx scripts/check-db.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.95.2",
