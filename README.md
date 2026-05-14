@@ -1,6 +1,6 @@
 # job-radar
 
-Personal AI-powered job-search aggregator that filters remote QA roles by **actual** geographic eligibility (not the lying "Remote" checkbox) and fuzzy skill fit.
+Personal AI-powered job-search aggregator that filters remote QA roles by **actual** geographic eligibility and fuzzy skill fit.
 
 Also: a working portfolio piece for an **AI Evals Engineer** career pivot — every LLM component in this repo has pre-registered success criteria, will have calibrated judges with documented bias mitigations, and the failure-mode taxonomy is checked in alongside the code.
 
